@@ -4,7 +4,7 @@ This API allows you create custom inventory menus by annotations
 # Using Bukkit-Inventories
 To build with maven, use these commands:
 ```shell
-$ git clone https://github.com/whippytools/whippy-tools.git
+$ git clone https://github.com/whippytools/bukkit-inventories.git
 $ mvn clean package
 ```
 You also can download this, as a dependency using the following setup.
