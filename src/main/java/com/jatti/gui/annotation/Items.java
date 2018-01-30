@@ -1,4 +1,4 @@
-package com.jatti.inventory.basic;
+package com.jatti.gui.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,9 +7,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface Inv {
+public @interface Items {
 
-    String name();
-    int size();
-
+    Item[] value();
 }

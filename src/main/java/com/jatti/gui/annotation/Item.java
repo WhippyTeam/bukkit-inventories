@@ -1,4 +1,4 @@
-package com.jatti.inventory.basic;
+package com.jatti.gui.annotation;
 
 import org.bukkit.Material;
 
@@ -11,11 +11,14 @@ public @interface Item {
 
     Material material();
 
-    int amount();
+    short type() default 0;
 
-    String name();
+    int amount() default 1;
 
-    String[] lore();
+    String name() default "";
+
+    String[] lore() default "";
 
     int slot();
+
 }
