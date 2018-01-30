@@ -84,6 +84,10 @@ public class Inventories {
         }
     }
 
+    public static Inventory getInventory(String inventoryName) {
+        return INVENTORY_MAP.get(inventoryName);
+    }
+
     public static Map<String, Inventory> getInventoryMap() {
         return new HashMap<>(INVENTORY_MAP);
     }
