@@ -41,3 +41,7 @@ target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.l
 target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst
 target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst
 target/maven-archiver/pom.properties
+.idea/fileTemplates/internal/AnnotationType.java
+.idea/fileTemplates/internal/Class.java
+.idea/fileTemplates/internal/Enum.java
+.idea/fileTemplates/internal/Interface.java
