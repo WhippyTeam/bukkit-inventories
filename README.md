@@ -41,7 +41,7 @@ public class TestInventory {
     @Fill(material = Material.STAINED_GLASS_PANE, type = 16)
     
     public void openInventory() {
-        Inventories.openInventory("&dsuperInventory", player);
+        Inventories.openInventory("superInventory", player);
     }
 
 }
@@ -50,7 +50,7 @@ As you can see, this is simple to use. Here's an example how to register this:
 ```java
     @Override
     public void onEnable() {
-        Inventories.register(TestInventory.class, "&dsuperInventory");
+        Inventories.register(TestInventory.class, "superInventory");
     }
 ```
 and how to open:
