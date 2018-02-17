@@ -24,6 +24,8 @@ SOFTWARE.
 
 package com.jatti.gui.annotation;
 
+import org.bukkit.event.inventory.InventoryType;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -35,5 +37,7 @@ public @interface Inventory {
 
     String name();
 
-    int size() default 9;
+    int size()  default 9;
+
+    InventoryType inventoryType() default InventoryType.CHEST;
 }

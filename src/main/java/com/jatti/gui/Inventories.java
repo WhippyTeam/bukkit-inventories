@@ -32,13 +32,16 @@ import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Inventories {
 
@@ -60,7 +63,11 @@ public class Inventories {
 
                         if (annotation.annotationType() == com.jatti.gui.annotation.Inventory.class) {
                             com.jatti.gui.annotation.Inventory inventoryAnnotation = (com.jatti.gui.annotation.Inventory) annotation;
-                            inventory = Bukkit.createInventory(null, inventoryAnnotation.size(), ChatColor.translateAlternateColorCodes('&', inventoryAnnotation.name()));
+                            if (inventoryAnnotation.inventoryType() == InventoryType.CHEST || inventoryAnnotation.inventoryType() == InventoryType.ENDER_CHEST) {
+                                inventory = Bukkit.createInventory(null, inventoryAnnotation.size(), ChatColor.translateAlternateColorCodes('&', inventoryAnnotation.name()));
+                            } else {
+                                inventory = Bukkit.createInventory(null, inventoryAnnotation.inventoryType(), ChatColor.translateAlternateColorCodes('&', inventoryAnnotation.name()));
+                            }
                         }
 
                         if (annotation.annotationType() == Items.class) {
@@ -73,8 +80,8 @@ public class Inventories {
 
                                 String lore = ChatColor.translateAlternateColorCodes('&', StringUtils.replaceEach(
                                         Arrays.toString(item.lore()),
-                                        new String[] {"[", "]"},
-                                        new String[] {"", ""}
+                                        new String[]{"[", "]"},
+                                        new String[]{"", ""}
                                 ));
 
                                 itemMeta.setLore(Arrays.asList(lore));
@@ -88,6 +95,17 @@ public class Inventories {
                             Fill fillAnnotation = (Fill) annotation;
 
                             ItemStack itemStack = new ItemStack(fillAnnotation.material(), fillAnnotation.amount(), fillAnnotation.type());
+                            ItemMeta itemMeta = itemStack.getItemMeta();
+                            itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', fillAnnotation.name()));
+
+                            String lore = ChatColor.translateAlternateColorCodes('&', StringUtils.replaceEach(
+                                    Arrays.toString(fillAnnotation.lore()),
+                                    new String[]{"[", "]"},
+                                    new String[]{"", ""}
+                            ));
+
+                            itemMeta.setLore(Arrays.asList(lore));
+                            itemStack.setItemMeta(itemMeta);
 
                             for (int i = 0; i < inventory.getSize(); i++) {
                                 if (inventory.getItem(i) == null) {

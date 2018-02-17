@@ -40,4 +40,8 @@ public @interface Fill {
     short type() default 0;
 
     int amount() default 1;
+
+    String name() default "";
+
+    String[] lore() default "";
 }
