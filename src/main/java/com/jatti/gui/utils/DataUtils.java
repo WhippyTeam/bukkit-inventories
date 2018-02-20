@@ -22,16 +22,39 @@
    SOFTWARE.
 */
 
-package com.jatti.gui.annotation;
+package com.jatti.gui.utils;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface Items {
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-    Item[] value();
+public class DataUtils {
+
+    public static ItemStack getItem(Material m, int amount, short data, String name, String[] lore) {
+        ItemStack itemStack = new ItemStack(m, amount, data);
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        
+        itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
+        itemMeta.setLore(color(Arrays.asList(lore)));
+        
+        itemStack.setItemMeta(itemMeta);
+        
+        return itemStack;
+    }
+    
+    private static List<String> color(List<String> toColor) {
+        List<String> colored = new ArrayList<String>();
+        for(String s : toColor) {
+            colored.add(ChatColor.translateAlternateColorCodes('&', s));
+        }
+        
+        return colored;
+    }
+    
+    private DataUtils() {}
 }
