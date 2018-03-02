@@ -43,4 +43,5 @@ public @interface Item {
     boolean forceEmptyName() default false;
 
     boolean forceEmptyLore() default false;
+
 }

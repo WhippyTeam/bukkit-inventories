@@ -43,4 +43,5 @@ public @interface Fill {
     boolean forceEmptyName() default false;
 
     boolean forceEmptyLore() default false;
+
 }

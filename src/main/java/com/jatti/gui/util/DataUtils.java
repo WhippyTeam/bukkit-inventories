@@ -52,7 +52,7 @@ public class DataUtils {
     }
     
     public static void handleFillAnnotation(Fill fill, Inventory inventory) {
-        int firstEmpty = 0;
+        int firstEmpty;
         
         while ((firstEmpty = inventory.firstEmpty()) > 0) {
             inventory.setItem(firstEmpty, DataUtils.getItem(fill.material(), fill.amount(), fill.type(), fill.name(), fill.lore(),
@@ -91,4 +91,5 @@ public class DataUtils {
     }
 
     private DataUtils() {}
+
 }

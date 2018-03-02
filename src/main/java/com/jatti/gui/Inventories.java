@@ -98,4 +98,5 @@ public class Inventories {
     }
 
     private Inventories() {}
+    
 }
