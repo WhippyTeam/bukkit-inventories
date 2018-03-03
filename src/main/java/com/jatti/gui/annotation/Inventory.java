@@ -35,5 +35,4 @@ public @interface Inventory {
     int size() default 9;
 
     InventoryType inventoryType() default InventoryType.CHEST;
-
 }
