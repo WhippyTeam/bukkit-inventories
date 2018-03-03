@@ -34,10 +34,15 @@ public class TestInventory {
     public TestInventory(Player player) {
         this.player = player;
     }
+    
+    public void itemAction(InventoryClickEvent event) {
+        event.getWhoClicked().sendMessage(ChatColor.AQUA + "Test Message!!");
+    }
 
     @Inventory(name = "&dPretty Inventory", size = 27)
     @Item(material = Material.GOLDEN_APPLE, type = 1, name = "&3First &lItem", lore = {"&9AUUUU", "&kAUUU"}, slot = 0)
-    @Item(material = Material.GOLDEN_APPLE, name = "&ctest", slot = 1)
+    @Item(material = Material.GOLDEN_APPLE, name = "&ctest", slot = 1, action = "itemAction")
+    @Item(material = Material.GOLDEN_APPLE, forceEmptyName = true, forceEmptyLore = true) 
     @Fill(material = Material.STAINED_GLASS_PANE, type = 16)
     
     public void openInventory() {
@@ -50,6 +55,7 @@ As you can see, this is simple to use. Here's an example how to register this:
 ```java
     @Override
     public void onEnable() {
+        Inventories.init(this);
         Inventories.register(TestInventory.class, "superInventory");
     }
 ```
