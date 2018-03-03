@@ -23,12 +23,14 @@ import com.jatti.gui.annotation.Fill;
 import com.jatti.gui.annotation.Item;
 import com.jatti.gui.annotation.Items;
 import com.jatti.gui.exception.InventoryParseException;
+import com.jatti.gui.listener.InventoryItemActionListener;
 import com.jatti.gui.util.DataUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
+import org.bukkit.plugin.Plugin;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -38,7 +40,12 @@ import java.util.Map;
 public class Inventories {
 
     private static final Map<String, Inventory> INVENTORY_MAP = new HashMap<>();
+    private static final Map<String, Map<Integer, Method>> ACTION_MAP = new HashMap<>();
 
+    public static void init(Plugin plugin) {
+        Bukkit.getPluginManager().registerEvents(new InventoryItemActionListener(), plugin);
+    }
+    
     public static void register(Class<?> clazz, String name) {
         if (clazz.getDeclaredMethods().length == 0) {
             throw new InventoryParseException("Class \"" + clazz.getName() + "\" does not have any methods!");
@@ -55,9 +62,13 @@ public class Inventories {
                     inventory = DataUtils.handleInventoryAnnotation((com.jatti.gui.annotation.Inventory) annotation);
                 }
                 
+                else if (annotation.annotationType() == Item.class) {
+                    DataUtils.handleItemAnnotation((Item) annotation, name, inventory, clazz, ACTION_MAP);
+                }
+                
                 else if (annotation.annotationType() == Items.class) {
                     for (Item item : ((Items) annotation).value()) {
-                        DataUtils.handleItemAnnotation(item, inventory);
+                        DataUtils.handleItemAnnotation(item, name, inventory, clazz, ACTION_MAP);
                     }
                 }
                 
@@ -72,6 +83,10 @@ public class Inventories {
 
     public static Map<String, Inventory> getInventoryMap() {
         return new HashMap<>(INVENTORY_MAP);
+    }
+    
+    public static Map<String, Map<Integer, Method>> getActionMap() {
+        return new HashMap<>(ACTION_MAP);
     }
 
     public static Inventory getInventory(String inventoryName) {

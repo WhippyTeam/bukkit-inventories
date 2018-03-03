@@ -39,6 +39,8 @@ public @interface Item {
     String name() default "";
 
     String[] lore() default "";
+    
+    String action() default "";
 
     boolean forceEmptyName() default false;
 
