@@ -32,11 +32,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DataUtils {
 
@@ -51,7 +47,7 @@ public class DataUtils {
         }
     }
 
-    public static void handleItemAnnotation(Item item, String name, Inventory inventory, Class<?> clazz, Map<String, Map<Integer, Method>> actionMap) {
+    public static void handleItemAnnotation(Item item, String name, Inventory inventory, Class<?> clazz, Map<String, Map<Integer, Method>> actionMap, Map<String, Map<Integer, Boolean>> clickableMap) {
         ItemStack itemStack = DataUtils.getItem(item.material(), item.amount(), item.type(), item.name(), item.lore(),
                         item.forceEmptyName(), item.forceEmptyLore());
         
@@ -69,15 +65,24 @@ public class DataUtils {
             
             actionMap.put(name, invMap);
         }
+
+        Map<Integer, Boolean> clickMap = clickableMap.getOrDefault(name, new HashMap<>());
+
+        clickMap.put(item.slot(), item.clickable());
+        clickableMap.put(name, clickMap);
     }
-    
-    public static void handleFillAnnotation(Fill fill, Inventory inventory) {
-        int firstEmpty = 0;
+
+    public static void handleFillAnnotation(Fill fill, String name, Inventory inventory, Map<String, Map<Integer, Boolean>> clickableMap) {
+        int firstEmpty;
         
         while ((firstEmpty = inventory.firstEmpty()) > 0) {
             inventory.setItem(firstEmpty, DataUtils.getItem(fill.material(), fill.amount(), fill.type(), fill.name(), fill.lore(),
                             fill.forceEmptyName(), fill.forceEmptyLore()));
+            Map<Integer, Boolean> clickMap = clickableMap.getOrDefault(name, new HashMap<>());
+            clickMap.put(firstEmpty, fill.clickable());
+            clickableMap.put(name, clickMap);
         }
+
     }
 
     public static ItemStack getItem(Material type, int amount, short data, String name, String[] lore, boolean forceEmptyName, boolean forceEmptyLore) {

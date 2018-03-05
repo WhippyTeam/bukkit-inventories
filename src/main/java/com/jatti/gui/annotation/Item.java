@@ -42,6 +42,8 @@ public @interface Item {
     
     String action() default "";
 
+    boolean clickable() default false;
+
     boolean forceEmptyName() default false;
 
     boolean forceEmptyLore() default false;

@@ -41,6 +41,7 @@ public class Inventories {
 
     private static final Map<String, Inventory> INVENTORY_MAP = new HashMap<>();
     private static final Map<String, Map<Integer, Method>> ACTION_MAP = new HashMap<>();
+    private static final Map<String, Map<Integer, Boolean>> CLICKABLE_MAP = new HashMap<>();
 
     public static void init(Plugin plugin) {
         Bukkit.getPluginManager().registerEvents(new InventoryItemActionListener(), plugin);
@@ -57,27 +58,36 @@ public class Inventories {
             }
 
             Inventory inventory = Bukkit.createInventory(null, 9, "");
+
+            boolean isInventoryAnnotation = false;
+
             for (Annotation annotation : method.getDeclaredAnnotations()) {
                 if (annotation.annotationType() == com.jatti.gui.annotation.Inventory.class) {
                     inventory = DataUtils.handleInventoryAnnotation((com.jatti.gui.annotation.Inventory) annotation);
+                    isInventoryAnnotation = true;
                 }
                 
                 else if (annotation.annotationType() == Item.class) {
-                    DataUtils.handleItemAnnotation((Item) annotation, name, inventory, clazz, ACTION_MAP);
+                    DataUtils.handleItemAnnotation((Item) annotation, name, inventory, clazz, ACTION_MAP, CLICKABLE_MAP);
                 }
                 
                 else if (annotation.annotationType() == Items.class) {
                     for (Item item : ((Items) annotation).value()) {
-                        DataUtils.handleItemAnnotation(item, name, inventory, clazz, ACTION_MAP);
+                        DataUtils.handleItemAnnotation(item, name, inventory, clazz, ACTION_MAP, CLICKABLE_MAP);
                     }
                 }
                 
                 else if (annotation.annotationType() == Fill.class) {
-                    DataUtils.handleFillAnnotation((Fill) annotation, inventory);
+                    DataUtils.handleFillAnnotation((Fill) annotation, name, inventory, CLICKABLE_MAP);
                 }
+
             }
 
-            INVENTORY_MAP.put(name, inventory);
+            if (isInventoryAnnotation) {
+                INVENTORY_MAP.put(name, inventory);
+            }
+
+
         }
     }
 
@@ -87,6 +97,10 @@ public class Inventories {
     
     public static Map<String, Map<Integer, Method>> getActionMap() {
         return new HashMap<>(ACTION_MAP);
+    }
+
+    public static Map<String, Map<Integer, Boolean>> getClickableMap() {
+        return new HashMap<>(CLICKABLE_MAP);
     }
 
     public static Inventory getInventory(String inventoryName) {

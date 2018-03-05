@@ -2,6 +2,7 @@ package com.jatti.gui.listener;
 
 import com.jatti.gui.Inventories;
 import com.jatti.gui.exception.InventoryActionException;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -38,7 +39,20 @@ public class InventoryItemActionListener implements Listener {
        if (action == null) {
            return;
        }
-       
+
+        Map<Integer, Boolean> clickableMap = Inventories.getClickableMap().get(inventoryName);
+        if (clickableMap == null) {
+            return;
+        }
+
+        if (clickableMap.get(event.getSlot()) == null) {
+            return;
+        }
+
+        if (!clickableMap.get(event.getSlot())) {
+            event.setResult(Event.Result.DENY);
+        }
+
        try {
            action.invoke(action.getDeclaringClass().newInstance(), event);
        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException e) {

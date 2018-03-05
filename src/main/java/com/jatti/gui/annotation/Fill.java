@@ -40,6 +40,8 @@ public @interface Fill {
 
     String[] lore() default "";
 
+    boolean clickable() default false;
+
     boolean forceEmptyName() default false;
 
     boolean forceEmptyLore() default false;
