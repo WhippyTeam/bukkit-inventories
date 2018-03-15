@@ -1,55 +1,45 @@
 package com.jatti.gui.listener;
 
 import com.jatti.gui.Inventories;
+import com.jatti.gui.basic.Inv;
 import com.jatti.gui.exception.InventoryActionException;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.Inventory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.Map.Entry;
 
 public class InventoryItemActionListener implements Listener {
     
     @EventHandler
     public void onClick(InventoryClickEvent event) {
+
        String inventoryName = "";
-       
-       for (Entry<String, Inventory> invEntry : Inventories.getInventoryMap().entrySet()) {
-           if (invEntry.getValue().equals(event.getClickedInventory())) {
-               inventoryName = invEntry.getKey();
+
+        for (Inv inv : Inventories.getInventoryList()) {
+
+            if (inv.getInventory().equals(event.getClickedInventory())) {
+                inventoryName = inv.getName();
                break;
            }
+
        }
-       
-       if (inventoryName.isEmpty()) {
-           return;
-       }
-       
-       Map<Integer, Method> actionMap = Inventories.getActionMap().get(inventoryName);
-       if (actionMap == null) {
-           return;
-       }
-       
-       Method action = actionMap.get(event.getSlot());
-       if (action == null) {
+
+        if (inventoryName.isEmpty()) {
            return;
        }
 
-        Map<Integer, Boolean> clickableMap = Inventories.getClickableMap().get(inventoryName);
-        if (clickableMap == null) {
-            return;
-        }
+        Inv inv = Inv.getInv(inventoryName);
 
-        if (clickableMap.get(event.getSlot()) == null) {
-            return;
-        }
+        Method action = inv.getActionForItem(event.getSlot());
 
-        if (!clickableMap.get(event.getSlot())) {
+        if (action == null) {
+           return;
+       }
+
+        if (!inv.getClickableForItem(event.getSlot())) {
             event.setResult(Event.Result.DENY);
         }
 

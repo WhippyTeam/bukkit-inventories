@@ -21,6 +21,7 @@ package com.jatti.gui.util;
 
 import com.jatti.gui.annotation.Fill;
 import com.jatti.gui.annotation.Item;
+import com.jatti.gui.basic.Inv;
 import com.jatti.gui.exception.InventoryActionException;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -32,7 +33,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class DataUtils {
 
@@ -47,40 +50,60 @@ public class DataUtils {
         }
     }
 
-    public static void handleItemAnnotation(Item item, String name, Inventory inventory, Class<?> clazz, Map<String, Map<Integer, Method>> actionMap, Map<String, Map<Integer, Boolean>> clickableMap) {
-        ItemStack itemStack = DataUtils.getItem(item.material(), item.amount(), item.type(), item.name(), item.lore(),
-                        item.forceEmptyName(), item.forceEmptyLore());
-        
+    public static void handleItemAnnotation(Item item, String name, Inventory inventory, Class<?> clazz) {
+
+        ItemStack itemStack = null;
+
+        if (!item.item().isEmpty()) {
+
+            for (Method method : clazz.getDeclaredMethods()) {
+
+                if (method.getReturnType() == ItemStack.class) {
+
+                    if (method.getName().equals(item.item())) {
+                        itemStack = (ItemStack) method.getDefaultValue();
+                        break;
+                    }
+
+                }
+
+            }
+
+        } else {
+
+            itemStack = DataUtils.getItem(item.material(), item.amount(), item.type(), item.name(), item.lore(),
+                    item.forceEmptyName(), item.forceEmptyLore());
+
+        }
         inventory.setItem(item.slot(), itemStack);
         String action = item.action();
-        
+        Inv inv = Inv.getInv(name);
+
         if (!action.isEmpty()) {
-            Map<Integer, Method> invMap = actionMap.getOrDefault(name, new HashMap<>());
-            
+
             try {
-                invMap.put(item.slot(), clazz.getMethod(action, InventoryClickEvent.class));
+                inv.getItemActions().put(item.slot(), clazz.getMethod(action, InventoryClickEvent.class));
+
             } catch (NoSuchMethodException | SecurityException e) {
+
                 throw new InventoryActionException("The \"" + action + "\" method was not found or has incompatible parameters!");
             }
-            
-            actionMap.put(name, invMap);
+
         }
 
-        Map<Integer, Boolean> clickMap = clickableMap.getOrDefault(name, new HashMap<>());
-
-        clickMap.put(item.slot(), item.clickable());
-        clickableMap.put(name, clickMap);
+        inv.getItemClickable().put(item.slot(), item.clickable());
     }
 
-    public static void handleFillAnnotation(Fill fill, String name, Inventory inventory, Map<String, Map<Integer, Boolean>> clickableMap) {
+    public static void handleFillAnnotation(Fill fill, String name, Inventory inventory) {
         int firstEmpty;
-        
+
+        Inv inv = Inv.getInv(name);
+
         while ((firstEmpty = inventory.firstEmpty()) > 0) {
             inventory.setItem(firstEmpty, DataUtils.getItem(fill.material(), fill.amount(), fill.type(), fill.name(), fill.lore(),
                             fill.forceEmptyName(), fill.forceEmptyLore()));
-            Map<Integer, Boolean> clickMap = clickableMap.getOrDefault(name, new HashMap<>());
-            clickMap.put(firstEmpty, fill.clickable());
-            clickableMap.put(name, clickMap);
+
+            inv.getItemClickable().put(firstEmpty, fill.clickable());
         }
 
     }

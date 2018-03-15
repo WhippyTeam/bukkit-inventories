@@ -19,35 +19,39 @@
 
 package com.jatti.gui;
 
-import com.jatti.gui.annotation.Fill;
-import com.jatti.gui.annotation.Item;
-import com.jatti.gui.annotation.Items;
+import com.jatti.gui.annotation.*;
+import com.jatti.gui.basic.Inv;
+import com.jatti.gui.basic.Trade;
 import com.jatti.gui.exception.InventoryParseException;
+import com.jatti.gui.exception.VillagerTradeParseException;
 import com.jatti.gui.listener.InventoryItemActionListener;
+import com.jatti.gui.listener.VillagerClickListener;
 import com.jatti.gui.util.DataUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.plugin.Plugin;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Inventories {
 
-    private static final Map<String, Inventory> INVENTORY_MAP = new HashMap<>();
-    private static final Map<String, Map<Integer, Method>> ACTION_MAP = new HashMap<>();
-    private static final Map<String, Map<Integer, Boolean>> CLICKABLE_MAP = new HashMap<>();
+    private static final List<Inv> INV_LIST = new ArrayList<>();
+    private static final List<Trade> TRADE_LIST = new ArrayList<>();
 
     public static void init(Plugin plugin) {
         Bukkit.getPluginManager().registerEvents(new InventoryItemActionListener(), plugin);
+        Bukkit.getPluginManager().registerEvents(new VillagerClickListener(), plugin);
     }
-    
-    public static void register(Class<?> clazz, String name) {
+
+    public static void registerInventory(Class<?> clazz, String name) {
         if (clazz.getDeclaredMethods().length == 0) {
             throw new InventoryParseException("Class \"" + clazz.getName() + "\" does not have any methods!");
         }
@@ -58,53 +62,211 @@ public class Inventories {
             }
 
             Inventory inventory = Bukkit.createInventory(null, 9, "");
-
-            boolean isInventoryAnnotation = false;
+            Trade trade = new Trade();
 
             for (Annotation annotation : method.getDeclaredAnnotations()) {
                 if (annotation.annotationType() == com.jatti.gui.annotation.Inventory.class) {
                     inventory = DataUtils.handleInventoryAnnotation((com.jatti.gui.annotation.Inventory) annotation);
-                    isInventoryAnnotation = true;
+
                 }
                 
                 else if (annotation.annotationType() == Item.class) {
-                    DataUtils.handleItemAnnotation((Item) annotation, name, inventory, clazz, ACTION_MAP, CLICKABLE_MAP);
+                    DataUtils.handleItemAnnotation((Item) annotation, name, inventory, clazz);
                 }
                 
                 else if (annotation.annotationType() == Items.class) {
                     for (Item item : ((Items) annotation).value()) {
-                        DataUtils.handleItemAnnotation(item, name, inventory, clazz, ACTION_MAP, CLICKABLE_MAP);
+                        DataUtils.handleItemAnnotation(item, name, inventory, clazz);
                     }
                 }
                 
                 else if (annotation.annotationType() == Fill.class) {
-                    DataUtils.handleFillAnnotation((Fill) annotation, name, inventory, CLICKABLE_MAP);
+                    DataUtils.handleFillAnnotation((Fill) annotation, name, inventory);
+                } else if (annotation.annotationType() == VillagerTrade.class) {
+                    VillagerTrade villagerTrade = (VillagerTrade) annotation;
+                    trade.setUUID(villagerTrade.villagerUUID());
+                } else if (annotation.annotationType() == TradeItem.class) {
+                    TradeItem tradeItem = (TradeItem) annotation;
+                    String tradeCost1 = tradeItem.tradeCost1();
+                    String tradeCost2 = tradeItem.tradeCost2();
+                    ItemStack tradeResult = null;
+                    ItemStack cost1 = null;
+                    ItemStack cost2 = null;
+
+                    if (tradeItem.tradeResult().isEmpty()) {
+                        throw new VillagerTradeParseException("Trade result can not be empty!");
+                    }
+
+                    if (tradeCost1.isEmpty() && (!tradeCost2.isEmpty())) {
+                        tradeCost1 = tradeCost2;
+                        tradeCost2 = "";
+                    }
+
+                    if (tradeCost1.isEmpty() && tradeCost2.isEmpty()) {
+                        throw new VillagerTradeParseException("At least one trade cost can not be empty!");
+                    }
+
+
+                    for (Method itemMethod : clazz.getDeclaredMethods()) {
+
+                        if (itemMethod.getReturnType() == ItemStack.class) {
+
+                            if (itemMethod.getName().equals(tradeItem.tradeResult())) {
+                                tradeResult = (ItemStack) itemMethod.getDefaultValue();
+                                continue;
+                            }
+
+                            if (itemMethod.getName().equals(tradeCost1)) {
+                                cost1 = (ItemStack) itemMethod.getDefaultValue();
+                                continue;
+                            }
+
+                            if (itemMethod.getName().equals(tradeCost2)) {
+                                cost2 = (ItemStack) itemMethod.getDefaultValue();
+                            }
+                        }
+                    }
+
+                    if (tradeResult != null) {
+
+                        MerchantRecipe merchantRecipe = new MerchantRecipe(tradeResult, tradeItem.maxUses());
+
+                        if (cost1 != null) {
+                            merchantRecipe.addIngredient(cost1);
+                        }
+
+                        if (cost2 != null) {
+                            merchantRecipe.addIngredient(cost2);
+                        }
+
+                        trade.getTrades().add(merchantRecipe);
+
+
+                    }
+
+                } else if (annotation.annotationType() == TradeItems.class) {
+
+                    TradeItems items = (TradeItems) annotation;
+
+                    for (TradeItem tradeItem : items.value()) {
+
+                        String tradeCost1 = tradeItem.tradeCost1();
+                        String tradeCost2 = tradeItem.tradeCost2();
+                        ItemStack tradeResult = null;
+                        ItemStack cost1 = null;
+                        ItemStack cost2 = null;
+
+                        if (tradeItem.tradeResult().isEmpty()) {
+                            throw new VillagerTradeParseException("Trade result can not be empty!");
+                        }
+
+                        if (tradeCost1.isEmpty() && (!tradeCost2.isEmpty())) {
+                            tradeCost1 = tradeCost2;
+                            tradeCost2 = "";
+                        }
+
+                        if (tradeCost1.isEmpty() && tradeCost2.isEmpty()) {
+                            throw new VillagerTradeParseException("At least one trade cost can not be empty!");
+                        }
+
+
+                        for (Method itemMethod : clazz.getDeclaredMethods()) {
+
+                            if (itemMethod.getReturnType() == ItemStack.class) {
+
+                                if (itemMethod.getName().equals(tradeItem.tradeResult())) {
+                                    tradeResult = (ItemStack) itemMethod.getDefaultValue();
+                                    continue;
+                                }
+
+                                if (itemMethod.getName().equals(tradeCost1)) {
+                                    cost1 = (ItemStack) itemMethod.getDefaultValue();
+                                    continue;
+                                }
+
+                                if (itemMethod.getName().equals(tradeCost2)) {
+                                    cost2 = (ItemStack) itemMethod.getDefaultValue();
+                                }
+                            }
+                        }
+
+                        if (tradeResult != null) {
+
+                            MerchantRecipe merchantRecipe = new MerchantRecipe(tradeResult, tradeItem.maxUses());
+
+                            if (cost1 != null) {
+                                merchantRecipe.addIngredient(cost1);
+                            }
+
+                            if (cost2 != null) {
+                                merchantRecipe.addIngredient(cost2);
+                            }
+
+                            trade.getTrades().add(merchantRecipe);
+
+                        }
+
+                    }
+
                 }
-
             }
 
-            if (isInventoryAnnotation) {
-                INVENTORY_MAP.put(name, inventory);
+            if (clazz.isAnnotationPresent(com.jatti.gui.annotation.Inventory.class)) {
+                Inv inv = Inv.getInv(name);
+                inv.setInventory(inventory);
+            } else {
+                Inv inv = Inv.getInv(name);
+                removeInventory(inv);
             }
-
 
         }
     }
 
-    public static Map<String, Inventory> getInventoryMap() {
-        return new HashMap<>(INVENTORY_MAP);
-    }
-    
-    public static Map<String, Map<Integer, Method>> getActionMap() {
-        return new HashMap<>(ACTION_MAP);
+    public static void registerVillagerTrade(Class<?> clazz) {
+
     }
 
-    public static Map<String, Map<Integer, Boolean>> getClickableMap() {
-        return new HashMap<>(CLICKABLE_MAP);
+    public static List<Trade> getTradeList() {
+        return new ArrayList<>(TRADE_LIST);
     }
 
-    public static Inventory getInventory(String inventoryName) {
-        return INVENTORY_MAP.get(inventoryName);
+    public static void addTrade(Trade trade) {
+        if (!TRADE_LIST.contains(trade)) {
+            TRADE_LIST.add(trade);
+        }
+    }
+
+    public static void removeTrade(Trade trade) {
+        if (TRADE_LIST.contains(trade)) {
+            TRADE_LIST.remove(trade);
+        }
+    }
+
+    public static List<Inv> getInventoryList() {
+        return new ArrayList<>(INV_LIST);
+    }
+
+    public static void addInventory(Inv inventory) {
+        if (!INV_LIST.contains(inventory)) {
+            INV_LIST.add(inventory);
+        }
+    }
+
+    public static void removeInventory(Inv inventory) {
+        if (INV_LIST.contains(inventory)) {
+            INV_LIST.remove(inventory);
+        }
+    }
+
+    public static Inventory getInventory(String name) {
+        for (Inv inv : getInventoryList()) {
+
+            if (inv.getName().equals(name)) {
+                return inv.getInventory();
+            }
+
+        }
+        return null;
     }
 
     public static void openInventory(String name, Player player) {

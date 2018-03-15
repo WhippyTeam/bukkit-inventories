@@ -30,7 +30,7 @@ public @interface Item {
 
     int slot();
 
-    Material material();
+    Material material() default Material.AIR;
 
     short type() default 0;
 
@@ -41,6 +41,8 @@ public @interface Item {
     String[] lore() default "";
     
     String action() default "";
+
+    String item() default "";
 
     boolean clickable() default false;
 
