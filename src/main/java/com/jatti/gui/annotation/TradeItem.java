@@ -7,9 +7,9 @@ import java.lang.annotation.*;
 @Repeatable(value = TradeItems.class)
 public @interface TradeItem {
 
-    String tradeCost1();
+    String firstTradeCost();
 
-    String tradeCost2() default "";
+    String secondTradeCost() default "";
 
     String tradeResult();
 
