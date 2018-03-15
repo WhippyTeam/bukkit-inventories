@@ -87,22 +87,22 @@ public class Inventories {
                     trade.setUUID(villagerTrade.villagerUUID());
                 } else if (annotation.annotationType() == TradeItem.class) {
                     TradeItem tradeItem = (TradeItem) annotation;
-                    String tradeCost1 = tradeItem.tradeCost1();
-                    String tradeCost2 = tradeItem.tradeCost2();
+                    String firstTradeCost = tradeItem.firstTradeCost();
+                    String secondTradeCost = tradeItem.secondTradeCost();
                     ItemStack tradeResult = null;
-                    ItemStack cost1 = null;
-                    ItemStack cost2 = null;
+                    ItemStack firstCost = null;
+                    ItemStack secondCost = null;
 
                     if (tradeItem.tradeResult().isEmpty()) {
                         throw new VillagerTradeParseException("Trade result can not be empty!");
                     }
 
-                    if (tradeCost1.isEmpty() && (!tradeCost2.isEmpty())) {
-                        tradeCost1 = tradeCost2;
-                        tradeCost2 = "";
+                    if (firstTradeCost.isEmpty() && (!secondTradeCost.isEmpty())) {
+                        firstTradeCost = secondTradeCost;
+                        secondTradeCost = "";
                     }
 
-                    if (tradeCost1.isEmpty() && tradeCost2.isEmpty()) {
+                    if (firstTradeCost.isEmpty() && secondTradeCost.isEmpty()) {
                         throw new VillagerTradeParseException("At least one trade cost can not be empty!");
                     }
 
@@ -116,13 +116,13 @@ public class Inventories {
                                 continue;
                             }
 
-                            if (itemMethod.getName().equals(tradeCost1)) {
-                                cost1 = (ItemStack) itemMethod.getDefaultValue();
+                            if (itemMethod.getName().equals(firstTradeCost)) {
+                                firstCost = (ItemStack) itemMethod.getDefaultValue();
                                 continue;
                             }
 
-                            if (itemMethod.getName().equals(tradeCost2)) {
-                                cost2 = (ItemStack) itemMethod.getDefaultValue();
+                            if (itemMethod.getName().equals(secondTradeCost)) {
+                                secondCost = (ItemStack) itemMethod.getDefaultValue();
                             }
                         }
                     }
@@ -131,12 +131,12 @@ public class Inventories {
 
                         MerchantRecipe merchantRecipe = new MerchantRecipe(tradeResult, tradeItem.maxUses());
 
-                        if (cost1 != null) {
-                            merchantRecipe.addIngredient(cost1);
+                        if (firstCost != null) {
+                            merchantRecipe.addIngredient(firstCost);
                         }
 
-                        if (cost2 != null) {
-                            merchantRecipe.addIngredient(cost2);
+                        if (secondCost != null) {
+                            merchantRecipe.addIngredient(secondCost);
                         }
 
                         trade.getTrades().add(merchantRecipe);
@@ -150,22 +150,22 @@ public class Inventories {
 
                     for (TradeItem tradeItem : items.value()) {
 
-                        String tradeCost1 = tradeItem.tradeCost1();
-                        String tradeCost2 = tradeItem.tradeCost2();
+                        String firstTradeCost = tradeItem.firstTradeCost();
+                        String secondTradeCost = tradeItem.secondTradeCost();
                         ItemStack tradeResult = null;
-                        ItemStack cost1 = null;
-                        ItemStack cost2 = null;
+                        ItemStack firstCost = null;
+                        ItemStack secondCost = null;
 
                         if (tradeItem.tradeResult().isEmpty()) {
                             throw new VillagerTradeParseException("Trade result can not be empty!");
                         }
 
-                        if (tradeCost1.isEmpty() && (!tradeCost2.isEmpty())) {
-                            tradeCost1 = tradeCost2;
-                            tradeCost2 = "";
+                        if (firstTradeCost.isEmpty() && (!secondTradeCost.isEmpty())) {
+                            firstTradeCost = secondTradeCost;
+                            secondTradeCost = "";
                         }
 
-                        if (tradeCost1.isEmpty() && tradeCost2.isEmpty()) {
+                        if (firstTradeCost.isEmpty() && secondTradeCost.isEmpty()) {
                             throw new VillagerTradeParseException("At least one trade cost can not be empty!");
                         }
 
@@ -179,13 +179,13 @@ public class Inventories {
                                     continue;
                                 }
 
-                                if (itemMethod.getName().equals(tradeCost1)) {
-                                    cost1 = (ItemStack) itemMethod.getDefaultValue();
+                                if (itemMethod.getName().equals(firstTradeCost)) {
+                                    firstCost = (ItemStack) itemMethod.getDefaultValue();
                                     continue;
                                 }
 
-                                if (itemMethod.getName().equals(tradeCost2)) {
-                                    cost2 = (ItemStack) itemMethod.getDefaultValue();
+                                if (itemMethod.getName().equals(secondTradeCost)) {
+                                    secondCost = (ItemStack) itemMethod.getDefaultValue();
                                 }
                             }
                         }
@@ -194,12 +194,12 @@ public class Inventories {
 
                             MerchantRecipe merchantRecipe = new MerchantRecipe(tradeResult, tradeItem.maxUses());
 
-                            if (cost1 != null) {
-                                merchantRecipe.addIngredient(cost1);
+                            if (firstCost != null) {
+                                merchantRecipe.addIngredient(firstCost);
                             }
 
-                            if (cost2 != null) {
-                                merchantRecipe.addIngredient(cost2);
+                            if (secondCost != null) {
+                                merchantRecipe.addIngredient(secondCost);
                             }
 
                             trade.getTrades().add(merchantRecipe);
