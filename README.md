@@ -42,7 +42,7 @@ public class TestInventory {
     @Inventory(name = "&dPretty Inventory", size = 27)
     @Item(material = Material.GOLDEN_APPLE, type = 1, name = "&3First &lItem", lore = {"&9AUUUU", "&kAUUU"}, slot = 0)
     @Item(material = Material.GOLDEN_APPLE, name = "&ctest", slot = 1, action = "itemAction")
-    @Item(material = Material.GOLDEN_APPLE, forceEmptyName = true, forceEmptyLore = true) 
+    @Item(material = Material.GOLDEN_APPLE, slot = 2, forceEmptyName = true, forceEmptyLore = true) 
     @Fill(material = Material.STAINED_GLASS_PANE, type = 16)
     
     public void openInventory() {
