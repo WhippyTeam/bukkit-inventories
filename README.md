@@ -1,4 +1,4 @@
-# bukkit-inventories [![](https://jitpack.io/v/whippytools/bukkit-inventories.svg)](https://jitpack.io/#whippytools/bukkit-inventories)
+# bukkit-inventories [![](https://jitpack.io/v/whippytools/bukkit-inventories.svg)](https://jitpack.io/#whippytools/bukkit-inventories) [![Build Status](https://travis-ci.org/whippytools/bukkit-inventories.svg?branch=master)](https://travis-ci.org/whippytools/bukkit-inventories)
 This API allows you create custom inventory menus by annotations
 
 # Using Bukkit-Inventories
