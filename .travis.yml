@@ -1,0 +1,22 @@
+language: java
+sudo: required
+
+install: true
+
+script:
+  - mvn clean install
+
+matrix:
+    - jdk: oraclejdk8
+      addons:
+        apt:
+          packages:
+            - oracle-java8-installer
+    - jdk: oraclejdk9
+      addons:
+        apt:
+          packages:
+            - oracle-java9-installer
+
+notifications:
+  email: false
