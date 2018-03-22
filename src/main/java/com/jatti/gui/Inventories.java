@@ -211,7 +211,7 @@ public class Inventories {
                 }
             }
 
-            if (clazz.isAnnotationPresent(com.jatti.gui.annotation.Inventory.class)) {
+            if (method.isAnnotationPresent(com.jatti.gui.annotation.Inventory.class)) {
                 Inv inv = Inv.getInv(name);
                 inv.setInventory(inventory);
             } else {
