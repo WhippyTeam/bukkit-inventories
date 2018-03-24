@@ -21,7 +21,7 @@ You also can download this, as a dependency using the following setup.
 	<dependency>
 	    <groupId>com.github.whippytools</groupId>
 	    <artifactId>bukkit-inventories</artifactId>
-	    <version>1.4.1-SNAPSHOT</version>
+	    <version>1.4.2-SNAPSHOT</version>
 	</dependency>
 ```
 
