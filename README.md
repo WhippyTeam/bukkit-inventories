@@ -35,6 +35,8 @@ public class TestInventory {
         this.player = player;
     }
     
+    public TestInventory() {}
+    
     public void itemAction(InventoryClickEvent event) {
         event.getWhoClicked().sendMessage(ChatColor.AQUA + "Test Message!!");
     }
