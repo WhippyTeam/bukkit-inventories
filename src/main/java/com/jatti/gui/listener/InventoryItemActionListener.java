@@ -12,41 +12,41 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class InventoryItemActionListener implements Listener {
-    
+
     @EventHandler
     public void onClick(InventoryClickEvent event) {
 
-       String inventoryName = "";
+        String inventoryName = "";
 
         for (Inv inv : Inventories.getInventoryList()) {
 
             if (inv.getInventory().equals(event.getClickedInventory())) {
                 inventoryName = inv.getName();
-               break;
-           }
+                break;
+            }
 
-       }
+        }
 
         if (inventoryName.isEmpty()) {
-           return;
-       }
+            return;
+        }
 
         Inv inv = Inv.getInv(inventoryName);
-
-        Method action = inv.getActionForItem(event.getSlot());
-
-        if (action == null) {
-           return;
-       }
 
         if (!inv.getClickableForItem(event.getSlot())) {
             event.setResult(Event.Result.DENY);
         }
 
-       try {
-           action.invoke(action.getDeclaringClass().newInstance(), event);
-       } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException e) {
-           throw new InventoryActionException("Unable to run action method for inventory \"" + inventoryName + "\" and slot " + event.getSlot());
-       }
+        Method action = inv.getActionForItem(event.getSlot());
+
+        if (action == null) {
+            return;
+        }
+
+        try {
+            action.invoke(action.getDeclaringClass().newInstance(), event);
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException e) {
+            throw new InventoryActionException("Unable to run action method for inventory \"" + inventoryName + "\" and slot " + event.getSlot());
+        }
     }
 }

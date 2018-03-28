@@ -95,8 +95,6 @@ public class DataUtils {
     }
 
     public static void handleFillAnnotation(Fill fill, String name, Inventory inventory) {
-        int firstEmpty;
-
         Inv inv = Inv.getInv(name);
 
         for (int i = 0; i < inventory.getSize(); i++) {
