@@ -75,6 +75,7 @@ public class DataUtils {
                     item.forceEmptyName(), item.forceEmptyLore());
 
         }
+
         inventory.setItem(item.slot(), itemStack);
         String action = item.action();
         Inv inv = Inv.getInv(name);
@@ -83,7 +84,6 @@ public class DataUtils {
 
             try {
                 inv.getItemActions().put(item.slot(), clazz.getMethod(action, InventoryClickEvent.class));
-
             } catch (NoSuchMethodException | SecurityException e) {
 
                 throw new InventoryActionException("The \"" + action + "\" method was not found or has incompatible parameters!");
@@ -99,11 +99,14 @@ public class DataUtils {
 
         Inv inv = Inv.getInv(name);
 
-        while ((firstEmpty = inventory.firstEmpty()) > 0) {
-            inventory.setItem(firstEmpty, DataUtils.getItem(fill.material(), fill.amount(), fill.type(), fill.name(), fill.lore(),
-                            fill.forceEmptyName(), fill.forceEmptyLore()));
+        for (int i = 0; i < inventory.getSize(); i++) {
 
-            inv.getItemClickable().put(firstEmpty, fill.clickable());
+            if (inventory.getItem(i) == null) {
+                inventory.setItem(i, DataUtils.getItem(fill.material(), fill.amount(), fill.type(), fill.name(), fill.lore(),
+                        fill.forceEmptyName(), fill.forceEmptyLore()));
+                inv.getItemClickable().put(i, fill.clickable());
+            }
+
         }
 
     }
@@ -139,4 +142,5 @@ public class DataUtils {
     }
 
     private DataUtils() {}
+
 }
