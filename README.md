@@ -29,7 +29,7 @@ You also can download this, as a dependency using the following setup.
 ```java
 public class TestInventory {
 
-    private final Player player;
+    private Player player;
 
     public TestInventory(Player player) {
         this.player = player;
