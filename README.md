@@ -58,7 +58,7 @@ As you can see, this is simple to use. Here's an example how to register this:
     @Override
     public void onEnable() {
         Inventories.init(this);
-        Inventories.register(TestInventory.class, "superInventory");
+        Inventories.registerInventory(TestInventory.class, "superInventory");
     }
 ```
 and how to open:
