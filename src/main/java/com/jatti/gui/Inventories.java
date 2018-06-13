@@ -19,270 +19,156 @@
 
 package com.jatti.gui;
 
-import com.jatti.gui.annotation.*;
-import com.jatti.gui.basic.Inv;
-import com.jatti.gui.basic.Trade;
-import com.jatti.gui.exception.InventoryParseException;
-import com.jatti.gui.exception.VillagerTradeParseException;
-import com.jatti.gui.listener.InventoryItemActionListener;
-import com.jatti.gui.listener.VillagerClickListener;
-import com.jatti.gui.util.DataUtils;
+import com.jatti.gui.animation.annotation.Animation;
+import com.jatti.gui.inv.InventoryImpl;
+import com.jatti.gui.inv.annotation.Fill;
+import com.jatti.gui.inv.annotation.Inventory;
+import com.jatti.gui.inv.annotation.Item;
+import com.jatti.gui.inv.annotation.Items;
+import com.jatti.gui.inv.exception.InventoryParseException;
+import com.jatti.gui.inv.listener.InventoryItemActionListener;
+import com.jatti.gui.trade.VillagerTrade;
+import com.jatti.gui.trade.annotation.Trade;
+import com.jatti.gui.trade.annotation.TradeItem;
+import com.jatti.gui.trade.annotation.TradeItems;
+import com.jatti.gui.trade.listener.VillagerClickListener;
+import com.jatti.gui.util.AnnotationUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.plugin.Plugin;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-public class Inventories {
+public final class Inventories {
 
-    private static final List<Inv> INV_LIST = new ArrayList<>();
-    private static final List<Trade> TRADE_LIST = new ArrayList<>();
+    private static final Set<InventoryImpl> INV_LIST = new HashSet<>();
+    private static final Set<VillagerTrade> TRADE_LIST = new HashSet<>();
+    private static Plugin plugin;
 
-    public static void init(Plugin plugin) {
-        Bukkit.getPluginManager().registerEvents(new InventoryItemActionListener(), plugin);
-        Bukkit.getPluginManager().registerEvents(new VillagerClickListener(), plugin);
+    public static void init(Plugin pl) {
+        plugin = pl;
+
+        Bukkit.getPluginManager().registerEvents(new InventoryItemActionListener(), pl);
+        Bukkit.getPluginManager().registerEvents(new VillagerClickListener(), pl);
     }
 
     public static void registerInventory(Class<?> clazz, String name) {
-        if (clazz.getDeclaredMethods().length == 0) {
-            throw new InventoryParseException("Class \"" + clazz.getName() + "\" does not have any methods!");
+        Annotation[] annotations = clazz.getDeclaredAnnotations();
+        if (annotations.length == 0) {
+            throw new InventoryParseException("Class \"" + clazz.getName() + "\" does not have any annotations!");
         }
 
-        for (Method method : clazz.getDeclaredMethods()) {
-            if (method.getDeclaredAnnotations().length == 0) {
-                continue;
+        if (!clazz.isAnnotationPresent(Inventory.class)) {
+            throw new InventoryParseException("Class \"" + clazz.getName() + "\" does not have an Inventory annotation!");
+        }
+
+        InventoryImpl inventory = null;
+        for (Annotation annotation : annotations) {
+            if (annotation.annotationType() == Inventory.class) {
+                inventory = AnnotationUtils.handleInventoryAnnotation((Inventory) annotation, name);
+            } else if (annotation.annotationType() == Item.class) {
+                AnnotationUtils.handleItemAnnotation((Item) annotation, inventory, clazz);
+            } else if (annotation.annotationType() == Items.class) {
+                for (Item item : ((Items) annotation).value()) {
+                    AnnotationUtils.handleItemAnnotation(item, inventory, clazz);
+                }
+            } else if (annotation.annotationType() == Fill.class) {
+                AnnotationUtils.handleFillAnnotation((Fill) annotation, inventory);
+            } else if (annotation.annotationType() == Animation.class) {
+                AnnotationUtils.handleAnimationAnnotation((Animation) annotation, inventory, plugin);
             }
-
-            Inventory inventory = Bukkit.createInventory(null, 9, "");
-            Trade trade = new Trade();
-
-            for (Annotation annotation : method.getDeclaredAnnotations()) {
-                if (annotation.annotationType() == com.jatti.gui.annotation.Inventory.class) {
-                    inventory = DataUtils.handleInventoryAnnotation((com.jatti.gui.annotation.Inventory) annotation);
-
-                }
-                
-                else if (annotation.annotationType() == Item.class) {
-                    DataUtils.handleItemAnnotation((Item) annotation, name, inventory, clazz);
-                }
-                
-                else if (annotation.annotationType() == Items.class) {
-                    for (Item item : ((Items) annotation).value()) {
-                        DataUtils.handleItemAnnotation(item, name, inventory, clazz);
-                    }
-                }
-                
-                else if (annotation.annotationType() == Fill.class) {
-                    DataUtils.handleFillAnnotation((Fill) annotation, name, inventory);
-                } else if (annotation.annotationType() == VillagerTrade.class) {
-                    VillagerTrade villagerTrade = (VillagerTrade) annotation;
-                    trade.setUUID(villagerTrade.villagerUUID());
-                } else if (annotation.annotationType() == TradeItem.class) {
-                    TradeItem tradeItem = (TradeItem) annotation;
-                    String firstTradeCost = tradeItem.firstTradeCost();
-                    String secondTradeCost = tradeItem.secondTradeCost();
-                    ItemStack tradeResult = null;
-                    ItemStack firstCost = null;
-                    ItemStack secondCost = null;
-
-                    if (tradeItem.tradeResult().isEmpty()) {
-                        throw new VillagerTradeParseException("Trade result can not be empty!");
-                    }
-
-                    if (firstTradeCost.isEmpty() && (!secondTradeCost.isEmpty())) {
-                        firstTradeCost = secondTradeCost;
-                        secondTradeCost = "";
-                    }
-
-                    if (firstTradeCost.isEmpty() && secondTradeCost.isEmpty()) {
-                        throw new VillagerTradeParseException("At least one trade cost can not be empty!");
-                    }
-
-
-                    for (Method itemMethod : clazz.getDeclaredMethods()) {
-
-                        if (itemMethod.getReturnType() == ItemStack.class) {
-
-                            if (itemMethod.getName().equals(tradeItem.tradeResult())) {
-                                tradeResult = (ItemStack) itemMethod.getDefaultValue();
-                                continue;
-                            }
-
-                            if (itemMethod.getName().equals(firstTradeCost)) {
-                                firstCost = (ItemStack) itemMethod.getDefaultValue();
-                                continue;
-                            }
-
-                            if (itemMethod.getName().equals(secondTradeCost)) {
-                                secondCost = (ItemStack) itemMethod.getDefaultValue();
-                            }
-                        }
-                    }
-
-                    if (tradeResult != null) {
-
-                        MerchantRecipe merchantRecipe = new MerchantRecipe(tradeResult, tradeItem.maxUses());
-
-                        if (firstCost != null) {
-                            merchantRecipe.addIngredient(firstCost);
-                        }
-
-                        if (secondCost != null) {
-                            merchantRecipe.addIngredient(secondCost);
-                        }
-
-                        trade.getTrades().add(merchantRecipe);
-
-
-                    }
-
-                } else if (annotation.annotationType() == TradeItems.class) {
-
-                    TradeItems items = (TradeItems) annotation;
-
-                    for (TradeItem tradeItem : items.value()) {
-
-                        String firstTradeCost = tradeItem.firstTradeCost();
-                        String secondTradeCost = tradeItem.secondTradeCost();
-                        ItemStack tradeResult = null;
-                        ItemStack firstCost = null;
-                        ItemStack secondCost = null;
-
-                        if (tradeItem.tradeResult().isEmpty()) {
-                            throw new VillagerTradeParseException("Trade result can not be empty!");
-                        }
-
-                        if (firstTradeCost.isEmpty() && (!secondTradeCost.isEmpty())) {
-                            firstTradeCost = secondTradeCost;
-                            secondTradeCost = "";
-                        }
-
-                        if (firstTradeCost.isEmpty() && secondTradeCost.isEmpty()) {
-                            throw new VillagerTradeParseException("At least one trade cost can not be empty!");
-                        }
-
-
-                        for (Method itemMethod : clazz.getDeclaredMethods()) {
-
-                            if (itemMethod.getReturnType() == ItemStack.class) {
-
-                                if (itemMethod.getName().equals(tradeItem.tradeResult())) {
-                                    tradeResult = (ItemStack) itemMethod.getDefaultValue();
-                                    continue;
-                                }
-
-                                if (itemMethod.getName().equals(firstTradeCost)) {
-                                    firstCost = (ItemStack) itemMethod.getDefaultValue();
-                                    continue;
-                                }
-
-                                if (itemMethod.getName().equals(secondTradeCost)) {
-                                    secondCost = (ItemStack) itemMethod.getDefaultValue();
-                                }
-                            }
-                        }
-
-                        if (tradeResult != null) {
-
-                            MerchantRecipe merchantRecipe = new MerchantRecipe(tradeResult, tradeItem.maxUses());
-
-                            if (firstCost != null) {
-                                merchantRecipe.addIngredient(firstCost);
-                            }
-
-                            if (secondCost != null) {
-                                merchantRecipe.addIngredient(secondCost);
-                            }
-
-                            trade.getTrades().add(merchantRecipe);
-
-                        }
-
-                    }
-
-                }
-            }
-
-            if (method.isAnnotationPresent(com.jatti.gui.annotation.Inventory.class)) {
-                Inv inv = Inv.getInv(name);
-                inv.setInventory(inventory);
-            } else {
-                Inv inv = Inv.getInv(name);
-                removeInventory(inv);
-            }
-
         }
     }
 
     public static void registerVillagerTrade(Class<?> clazz) {
+        Annotation[] annotations = clazz.getDeclaredAnnotations();
+        if (annotations.length == 0) {
+            throw new InventoryParseException("Class \"" + clazz.getName() + "\" does not have any annotations!");
+        }
 
+        if (!clazz.isAnnotationPresent(Trade.class)) {
+            throw new InventoryParseException("Class \"" + clazz.getName() + "\" does not have a VillagerTrade annotation!");
+        }
+
+        VillagerTrade villagerTrade = null;
+        for (Annotation annotation : annotations) {
+            if (annotation.annotationType() == Trade.class) {
+                villagerTrade = new VillagerTrade(UUID.fromString(((Trade) annotation).villagerUUID()));
+            } else if (annotation.annotationType() == TradeItem.class) {
+                AnnotationUtils.handleTradeItemAnnotation((TradeItem) annotation, villagerTrade, clazz);
+            } else if (annotation.annotationType() == TradeItems.class) {
+                for (TradeItem tradeItem : ((TradeItems) annotation).value()) {
+                    AnnotationUtils.handleTradeItemAnnotation(tradeItem, villagerTrade, clazz);
+                }
+            }
+        }
     }
 
-    public static List<Trade> getTradeList() {
+    public static List<VillagerTrade> getTradeList() {
         return new ArrayList<>(TRADE_LIST);
     }
 
-    public static void addTrade(Trade trade) {
+    public static void addTrade(VillagerTrade trade) {
         if (!TRADE_LIST.contains(trade)) {
             TRADE_LIST.add(trade);
         }
     }
 
-    public static void removeTrade(Trade trade) {
-        if (TRADE_LIST.contains(trade)) {
-            TRADE_LIST.remove(trade);
-        }
+    public static void removeTrade(VillagerTrade trade) {
+        TRADE_LIST.remove(trade);
     }
 
-    public static List<Inv> getInventoryList() {
+    public static List<InventoryImpl> getInventoryList() {
         return new ArrayList<>(INV_LIST);
     }
 
-    public static void addInventory(Inv inventory) {
+    public static void addInventory(InventoryImpl inventory) {
         if (!INV_LIST.contains(inventory)) {
             INV_LIST.add(inventory);
         }
     }
 
-    public static void removeInventory(Inv inventory) {
-        if (INV_LIST.contains(inventory)) {
-            INV_LIST.remove(inventory);
-        }
+    public static void removeInventory(InventoryImpl inventory) {
+        INV_LIST.remove(inventory);
     }
 
-    public static Inventory getInventory(String name) {
-        for (Inv inv : getInventoryList()) {
-
+    public static InventoryImpl getInventory(String name) {
+        for (InventoryImpl inv : getInventoryList()) {
             if (inv.getName().equals(name)) {
-                return inv.getInventory();
+                return inv;
             }
-
         }
+
         return null;
     }
 
     public static void openInventory(String name, Player player) {
-        player.openInventory(getInventory(name));
+        InventoryImpl inv = getInventory(name);
+        if (inv == null) {
+            return;
+        }
+
+        player.openInventory(inv.getInventory());
+        inv.animate();
     }
 
     public static void openWorkbench(String name, Player player) {
-        Inventory inv = getInventory(name);
-        if (inv.getType() != InventoryType.WORKBENCH) {
-            player.openInventory(inv);
+        InventoryImpl inv = getInventory(name);
+        if (inv == null) {
+            return;
+        }
+
+        if (inv.getInventory().getType() != InventoryType.WORKBENCH) {
+            player.openInventory(inv.getInventory());
             return;
         }
 
         InventoryView workbench = player.openWorkbench(null, true);
         for (int i = 9; i >= 0; i--) {
-            workbench.setItem(i, inv.getItem(i));
+            workbench.setItem(i, inv.getInventory().getItem(i));
         }
 
         player.updateInventory();
