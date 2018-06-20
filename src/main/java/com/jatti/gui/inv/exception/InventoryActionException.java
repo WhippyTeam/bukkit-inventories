@@ -1,4 +1,4 @@
-package com.jatti.gui.exception;
+package com.jatti.gui.inv.exception;
 
 
 public class InventoryActionException extends RuntimeException {
@@ -8,4 +8,5 @@ public class InventoryActionException extends RuntimeException {
     public InventoryActionException(String message) {
         super(message);
     }
+
 }

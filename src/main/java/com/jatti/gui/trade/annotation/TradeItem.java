@@ -1,4 +1,4 @@
-package com.jatti.gui.annotation;
+package com.jatti.gui.trade.annotation;
 
 import java.lang.annotation.*;
 

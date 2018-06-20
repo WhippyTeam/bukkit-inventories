@@ -1,8 +1,7 @@
-package com.jatti.gui.listener;
+package com.jatti.gui.trade.listener;
 
 import com.jatti.gui.Inventories;
-import com.jatti.gui.basic.Trade;
-import org.bukkit.entity.EntityType;
+import com.jatti.gui.trade.VillagerTrade;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,20 +13,15 @@ public class VillagerClickListener implements Listener {
 
     @EventHandler
     public void onEntityClick(PlayerInteractAtEntityEvent event) {
-
-        if (event.getRightClicked().getType() == EntityType.VILLAGER) {
-
+        if (event.getRightClicked() instanceof Villager) {
             Villager villager = (Villager) event.getRightClicked();
             UUID uuid = villager.getUniqueId();
 
-            for (Trade trade : Inventories.getTradeList()) {
-
+            for (VillagerTrade trade : Inventories.getTradeList()) {
                 if (trade.getUUID().equals(uuid)) {
-
                     villager.setRecipes(trade.getTrades());
                 }
             }
         }
-
     }
 }

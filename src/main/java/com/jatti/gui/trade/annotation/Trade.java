@@ -1,4 +1,4 @@
-package com.jatti.gui.annotation;
+package com.jatti.gui.trade.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,8 +7,8 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface TradeItems {
+public @interface Trade {
 
-    TradeItem[] value();
+    String villagerUUID();
 
 }

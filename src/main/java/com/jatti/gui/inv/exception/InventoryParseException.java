@@ -22,7 +22,7 @@
    SOFTWARE.
 */
 
-package com.jatti.gui.exception;
+package com.jatti.gui.inv.exception;
 
 public class InventoryParseException extends RuntimeException {
 
@@ -31,4 +31,5 @@ public class InventoryParseException extends RuntimeException {
     public InventoryParseException(String message) {
         super(message);
     }
+
 }
