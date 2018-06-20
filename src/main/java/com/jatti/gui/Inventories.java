@@ -21,10 +21,7 @@ package com.jatti.gui;
 
 import com.jatti.gui.animation.annotation.Animation;
 import com.jatti.gui.inv.InventoryImpl;
-import com.jatti.gui.inv.annotation.Fill;
-import com.jatti.gui.inv.annotation.Inventory;
-import com.jatti.gui.inv.annotation.Item;
-import com.jatti.gui.inv.annotation.Items;
+import com.jatti.gui.inv.annotation.*;
 import com.jatti.gui.inv.exception.InventoryParseException;
 import com.jatti.gui.inv.listener.InventoryItemActionListener;
 import com.jatti.gui.trade.VillagerTrade;
@@ -79,6 +76,12 @@ public final class Inventories {
                 AnnotationUtils.handleFillAnnotation((Fill) annotation, inventory);
             } else if (annotation.annotationType() == Animation.class) {
                 AnnotationUtils.handleAnimationAnnotation((Animation) annotation, inventory, plugin);
+            } else if (annotation.annotationType() == ConfigItem.class) {
+                AnnotationUtils.handleConfigItemAnnotation(plugin.getConfig(), (ConfigItem) annotation, inventory, clazz);
+            } else if (annotation.annotationType() == ConfigItems.class) {
+                for (ConfigItem item : ((ConfigItems) annotation).value()) {
+                    AnnotationUtils.handleConfigItemAnnotation(plugin.getConfig(), item, inventory, clazz);
+                }
             }
         }
     }
