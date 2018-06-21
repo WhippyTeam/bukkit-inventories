@@ -2,12 +2,13 @@
 This API allows you create custom inventory menus by annotations
 
 # Using Bukkit-Inventories
-To build with maven, use these commands:
+To build with gradle, use these commands:
 ```shell
 $ git clone https://github.com/whippytools/bukkit-inventories.git
-$ mvn clean package
+$ gradle jar
 ```
 You also can download this, as a dependency using the following setup.
+In Maven:
 ```xml
 	<repositories>
 		<repository>
@@ -21,12 +22,29 @@ You also can download this, as a dependency using the following setup.
 	<dependency>
 	    <groupId>com.github.whippytools</groupId>
 	    <artifactId>bukkit-inventories</artifactId>
-	    <version>1.5-STABLE</version>
+	    <version>1.6-STABLE</version>
 	</dependency>
 ```
+Or in Gradle:
+```gradle
+repositories {
+    maven { url "https://jitpack.io" }
+}```
+
+```gradle
+dependencies {
+    compile group: 'com.github.whippytools', name: 'bukkit-inventories', version: '1-6-STABLE'
+}```
 
 # Example usage (normal inv)
 ```java
+@Inventory(name = "&dPretty Inventory", size = 27)
+@Item(material = Material.GOLDEN_APPLE, type = 1, name = "&3First &lItem", lore = {"&9AUUUU", "&kAUUU"}, slot = 0)
+@Item(material = Material.GOLDEN_APPLE, name = "&ctest", slot = 1, action = "itemAction")
+@Item(material = Material.GOLDEN_APPLE, slot = 2, forceEmptyName = true, forceEmptyLore = true)
+@Item(item = "coolItem", slot = 3)
+@ConfigItem("value.from.config", slot = 4)
+@Fill(material = Material.STAINED_GLASS_PANE, type = 16)
 public class TestInventory {
 
     private Player player;
@@ -44,14 +62,6 @@ public class TestInventory {
     public ItemStack coolItem() {
       return new ItemStack(Material.STONE, 1);
     }
-
-    @Inventory(name = "&dPretty Inventory", size = 27)
-    @Item(material = Material.GOLDEN_APPLE, type = 1, name = "&3First &lItem", lore = {"&9AUUUU", "&kAUUU"}, slot = 0)
-    @Item(material = Material.GOLDEN_APPLE, name = "&ctest", slot = 1, action = "itemAction")
-    @Item(material = Material.GOLDEN_APPLE, slot = 2, forceEmptyName = true, forceEmptyLore = true)
-    @Item(item = "coolItem", slot = 3)
-    @ConfigItem("value.from.config", slot = 4)
-    @Fill(material = Material.STAINED_GLASS_PANE, type = 16)
     
     public void openInventory() {
         Inventories.openInventory("superInventory", player);

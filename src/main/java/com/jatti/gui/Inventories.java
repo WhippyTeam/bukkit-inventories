@@ -23,6 +23,7 @@ import com.jatti.gui.animation.annotation.Animation;
 import com.jatti.gui.inv.InventoryImpl;
 import com.jatti.gui.inv.annotation.*;
 import com.jatti.gui.inv.exception.InventoryParseException;
+import com.jatti.gui.inv.listener.InventoryCloseListener;
 import com.jatti.gui.inv.listener.InventoryItemActionListener;
 import com.jatti.gui.trade.VillagerTrade;
 import com.jatti.gui.trade.annotation.Trade;
@@ -47,9 +48,9 @@ public final class Inventories {
 
     public static void init(Plugin pl) {
         plugin = pl;
-
         Bukkit.getPluginManager().registerEvents(new InventoryItemActionListener(), pl);
         Bukkit.getPluginManager().registerEvents(new VillagerClickListener(), pl);
+        Bukkit.getPluginManager().registerEvents(new InventoryCloseListener(), pl);
     }
 
     public static void registerInventory(Class<?> clazz, String name) {
@@ -64,24 +65,40 @@ public final class Inventories {
 
         InventoryImpl inventory = null;
         for (Annotation annotation : annotations) {
-            if (annotation.annotationType() == Inventory.class) {
-                inventory = AnnotationUtils.handleInventoryAnnotation((Inventory) annotation, name);
-            } else if (annotation.annotationType() == Item.class) {
-                AnnotationUtils.handleItemAnnotation((Item) annotation, inventory, clazz);
-            } else if (annotation.annotationType() == Items.class) {
-                for (Item item : ((Items) annotation).value()) {
-                    AnnotationUtils.handleItemAnnotation(item, inventory, clazz);
-                }
-            } else if (annotation.annotationType() == Fill.class) {
-                AnnotationUtils.handleFillAnnotation((Fill) annotation, inventory);
-            } else if (annotation.annotationType() == Animation.class) {
-                AnnotationUtils.handleAnimationAnnotation((Animation) annotation, inventory, plugin);
-            } else if (annotation.annotationType() == ConfigItem.class) {
-                AnnotationUtils.handleConfigItemAnnotation(plugin.getConfig(), (ConfigItem) annotation, inventory, clazz);
-            } else if (annotation.annotationType() == ConfigItems.class) {
-                for (ConfigItem item : ((ConfigItems) annotation).value()) {
-                    AnnotationUtils.handleConfigItemAnnotation(plugin.getConfig(), item, inventory, clazz);
-                }
+
+            switch (annotation.annotationType().getSimpleName()) {
+
+                case "Inventory":
+                    inventory = AnnotationUtils.handleInventoryAnnotation((Inventory) annotation, name);
+                    break;
+
+                case "Item":
+                    AnnotationUtils.handleItemAnnotation((Item) annotation, inventory, clazz);
+                    break;
+
+                case "Items":
+                    for (Item item : ((Items) annotation).value()) {
+                        AnnotationUtils.handleItemAnnotation(item, inventory, clazz);
+                    }
+                    break;
+
+                case "Fill":
+                    AnnotationUtils.handleFillAnnotation((Fill) annotation, inventory);
+                    break;
+
+                case "Animation":
+                    AnnotationUtils.handleAnimationAnnotation((Animation) annotation, inventory, plugin);
+                    break;
+
+                case "ConfigItem":
+                    AnnotationUtils.handleConfigItemAnnotation(plugin.getConfig(), (ConfigItem) annotation, inventory, clazz);
+                    break;
+
+                case "ConfigItems":
+                    for (ConfigItem item : ((ConfigItems) annotation).value()) {
+                        AnnotationUtils.handleConfigItemAnnotation(plugin.getConfig(), item, inventory, clazz);
+                    }
+                    break;
             }
         }
     }

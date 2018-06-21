@@ -64,9 +64,10 @@ public class InventoryImpl {
     }
 
     public void animate() {
-        /**  Inventory inventory = Bukkit.createInventory(null, this.inventory.getSize(), this.inventory.getTitle());
-         inventory.addItem(this.inventory.getContents());
-         animations.forEach(animation -> animation.start(inventory));**/
+        this.animations.forEach(animation -> animation.start(this.inventory));
     }
 
+    public void stopAnimations() {
+        this.animations.forEach(AbstractAnimation::stop);
+    }
 }

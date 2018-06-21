@@ -50,8 +50,7 @@ import java.util.List;
 
 public final class AnnotationUtils {
 
-    private AnnotationUtils() {
-    }
+    private AnnotationUtils() { }
 
     public static InventoryImpl handleInventoryAnnotation(Inventory inventoryAnnotation, String name) {
         InventoryType type = inventoryAnnotation.inventoryType();
