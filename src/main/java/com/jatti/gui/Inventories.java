@@ -99,6 +99,7 @@ public final class Inventories {
                         AnnotationUtils.handleConfigItemAnnotation(plugin.getConfig(), item, inventory, clazz);
                     }
                     break;
+
             }
         }
     }

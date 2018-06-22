@@ -70,4 +70,5 @@ public class InventoryImpl {
     public void stopAnimations() {
         this.animations.forEach(AbstractAnimation::stop);
     }
+
 }
