@@ -5,6 +5,10 @@ This API allows you create custom inventory menus by annotations
 To build with gradle, use these commands:
 ```shell
 $ git clone https://github.com/whippytools/bukkit-inventories.git
+$ gradle build
+```
+and if you want jar you can use:
+```shell
 $ gradle jar
 ```
 You also can download this, as a dependency using the following setup.
