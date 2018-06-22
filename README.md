@@ -29,12 +29,14 @@ Or in Gradle:
 ```gradle
 repositories {
     maven { url "https://jitpack.io" }
-}```
+}
+```
 
 ```gradle
 dependencies {
     compile group: 'com.github.whippytools', name: 'bukkit-inventories', version: '1-6-STABLE'
-}```
+}
+```
 
 # Example usage (normal inv)
 ```java
