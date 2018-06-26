@@ -44,7 +44,7 @@ dependencies {
 
 # Example usage (normal inv)
 ```java
-@Inventory(name = "&dPretty Inventory", size = 27)
+@Inventory(title = "&dPretty Inventory", size = 27)
 @Item(material = Material.GOLDEN_APPLE, type = 1, name = "&3First &lItem", lore = {"&9AUUUU", "&kAUUU"}, slot = 0)
 @Item(material = Material.GOLDEN_APPLE, name = "&ctest", slot = 1, action = "itemAction")
 @Item(material = Material.GOLDEN_APPLE, slot = 2, forceEmptyName = true, forceEmptyLore = true)
