@@ -51,7 +51,7 @@ dependencies {
 @Item(item = "coolItem", slot = 3)
 @ConfigItem(value = "value.from.config", slot = 4)
 @Fill(material = Material.STAINED_GLASS_PANE, type = 16)
-public class TestInventory {
+public class TestInventory implements Listener{
 
     public void itemAction(InventoryClickEvent event) {
         event.getWhoClicked().sendMessage(ChatColor.AQUA + "Test Message!!");
@@ -64,6 +64,7 @@ public class TestInventory {
 }
 ```
 (there are so fuckin' many ways to do it with config so don't you ever say that this is for static inventories)
+Do not forget to register Listener!
 
 # Example Usage (villager trade inv)
 ```java
