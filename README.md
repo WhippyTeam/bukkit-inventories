@@ -39,7 +39,8 @@ repositories {
 ```gradle
 dependencies {
     compile group: 'com.github.whippytools', name: 'bukkit-inventories', version: 'newest-version'
-}```
+}
+```
 
 # Example usage (normal inv)
 ```java
