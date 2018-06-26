@@ -1,8 +1,8 @@
 package com.jatti.gui.inv.listener;
 
+import com.jatti.gui.inv.exception.InventoryActionException;
 import com.jatti.gui.Inventories;
 import com.jatti.gui.inv.InventoryImpl;
-import com.jatti.gui.inv.exception.InventoryActionException;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

@@ -5,7 +5,11 @@ This API allows you create custom inventory menus by annotations
 To build with gradle, use these commands:
 ```shell
 $ git clone https://github.com/whippytools/bukkit-inventories.git
-$ gradle jar
+$ gradle build
+```
+and if you want jar (with all dependencies) you can use:
+```shell
+$ gradle shadowJar
 ```
 You also can download this, as a dependency using the following setup.
 In Maven:
@@ -22,7 +26,7 @@ In Maven:
 	<dependency>
 	    <groupId>com.github.whippytools</groupId>
 	    <artifactId>bukkit-inventories</artifactId>
-	    <version>1.6-STABLE</version>
+	    <version>newest-version</version>
 	</dependency>
 ```
 Or in Gradle:
@@ -33,7 +37,7 @@ repositories {
 
 ```gradle
 dependencies {
-    compile group: 'com.github.whippytools', name: 'bukkit-inventories', version: '1-6-STABLE'
+    compile group: 'com.github.whippytools', name: 'bukkit-inventories', version: 'newest-version'
 }```
 
 # Example usage (normal inv)
@@ -47,24 +51,12 @@ dependencies {
 @Fill(material = Material.STAINED_GLASS_PANE, type = 16)
 public class TestInventory {
 
-    private Player player;
-
-    public TestInventory(Player player) {
-        this.player = player;
-    }
-    
-    public TestInventory() {}
-    
     public void itemAction(InventoryClickEvent event) {
         event.getWhoClicked().sendMessage(ChatColor.AQUA + "Test Message!!");
     }
 
     public ItemStack coolItem() {
       return new ItemStack(Material.STONE, 1);
-    }
-    
-    public void openInventory() {
-        Inventories.openInventory("superInventory", player);
     }
 
 }
@@ -76,14 +68,6 @@ public class TestInventory {
 @Trade(villagerUUID = "uuid of the villager")
 @TradeItem(firstTradeCost = "firstTradeCost", tradeResult = "tradeResult")
 public class TestTrade {
-
-    private Player player;
-
-    public TestTrade(Player player) {
-        this.player = player;
-    }
-
-    public TestTrade() {}
 
     private ItemStack firstTradeCost() {
         return new ItemStack(Material.STONE, 1);
@@ -100,10 +84,11 @@ As you can see, this is simple to use. Here's an example how to register this:
     @Override
     public void onEnable() {
         Inventories.init(this);
-        Inventories.registerInventory(TestInventory.class, "superInventory");
+        Inventories.registerInventory(new TestInventory(), "superInventory");
+        Inventories.registerVillagerTrade(new TestTrade());
     }
 ```
-and how to open:
+and how to open (normal inv):
 ```java
 public class Command implements CommandExecutor {
 
@@ -111,13 +96,14 @@ public class Command implements CommandExecutor {
     public boolean onCommand(CommandSender commandSender, org.bukkit.command.Command command, String s, String[] strings) {
         if (command.getName().equalsIgnoreCase("test")) {
             Player player = (Player) commandSender;
-
-            new TestInventory(player).openInventory();
+            Inventories.openInventory("test", player);
         }
 
         return false;
     }
 }
 ```
+Villager trades work on villager's UUID, so you don't have to open it, when you'll click right villager it will work by itself.
+
 If you are using @ConfigItem annotation remember to set ItemStack in config as: `MainClass.getInstance().getConfig().set("test", itemstack)`
 If you have any questions, do not hesitate to contact us.

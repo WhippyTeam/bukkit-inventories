@@ -19,12 +19,13 @@
 
 package com.jatti.gui;
 
-import com.jatti.gui.animation.annotation.Animation;
 import com.jatti.gui.inv.InventoryImpl;
 import com.jatti.gui.inv.annotation.*;
 import com.jatti.gui.inv.exception.InventoryParseException;
-import com.jatti.gui.inv.listener.InventoryCloseListener;
 import com.jatti.gui.inv.listener.InventoryItemActionListener;
+import com.jatti.gui.updater.Updater;
+import com.jatti.gui.animation.annotation.Animation;
+import com.jatti.gui.inv.listener.InventoryCloseListener;
 import com.jatti.gui.trade.VillagerTrade;
 import com.jatti.gui.trade.annotation.Trade;
 import com.jatti.gui.trade.annotation.TradeItem;
@@ -51,9 +52,12 @@ public final class Inventories {
         Bukkit.getPluginManager().registerEvents(new InventoryItemActionListener(), pl);
         Bukkit.getPluginManager().registerEvents(new VillagerClickListener(), pl);
         Bukkit.getPluginManager().registerEvents(new InventoryCloseListener(), pl);
+        System.out.println("[Bukkit-Inventories] Checking for updates...");
+        Updater.checkForUpdates();
     }
 
-    public static void registerInventory(Class<?> clazz, String name) {
+    public static void registerInventory(Object inventoryObject, String name) {
+        Class<?> clazz = inventoryObject.getClass();
         Annotation[] annotations = clazz.getDeclaredAnnotations();
         if (annotations.length == 0) {
             throw new InventoryParseException("Class \"" + clazz.getName() + "\" does not have any annotations!");
@@ -73,12 +77,12 @@ public final class Inventories {
                     break;
 
                 case "Item":
-                    AnnotationUtils.handleItemAnnotation((Item) annotation, inventory, clazz);
+                    AnnotationUtils.handleItemAnnotation((Item) annotation, inventory, inventoryObject);
                     break;
 
                 case "Items":
                     for (Item item : ((Items) annotation).value()) {
-                        AnnotationUtils.handleItemAnnotation(item, inventory, clazz);
+                        AnnotationUtils.handleItemAnnotation(item, inventory, inventoryObject);
                     }
                     break;
 
@@ -91,12 +95,12 @@ public final class Inventories {
                     break;
 
                 case "ConfigItem":
-                    AnnotationUtils.handleConfigItemAnnotation(plugin.getConfig(), (ConfigItem) annotation, inventory, clazz);
+                    AnnotationUtils.handleConfigItemAnnotation(plugin.getConfig(), (ConfigItem) annotation, inventory, inventoryObject);
                     break;
 
                 case "ConfigItems":
                     for (ConfigItem item : ((ConfigItems) annotation).value()) {
-                        AnnotationUtils.handleConfigItemAnnotation(plugin.getConfig(), item, inventory, clazz);
+                        AnnotationUtils.handleConfigItemAnnotation(plugin.getConfig(), item, inventory, inventoryObject);
                     }
                     break;
 
@@ -104,7 +108,8 @@ public final class Inventories {
         }
     }
 
-    public static void registerVillagerTrade(Class<?> clazz) {
+    public static void registerVillagerTrade(Object tradeObject) {
+        Class<?> clazz = tradeObject.getClass();
         Annotation[] annotations = clazz.getDeclaredAnnotations();
         if (annotations.length == 0) {
             throw new InventoryParseException("Class \"" + clazz.getName() + "\" does not have any annotations!");
@@ -119,10 +124,10 @@ public final class Inventories {
             if (annotation.annotationType() == Trade.class) {
                 villagerTrade = new VillagerTrade(UUID.fromString(((Trade) annotation).villagerUUID()));
             } else if (annotation.annotationType() == TradeItem.class) {
-                AnnotationUtils.handleTradeItemAnnotation((TradeItem) annotation, villagerTrade, clazz);
+                AnnotationUtils.handleTradeItemAnnotation((TradeItem) annotation, villagerTrade, tradeObject);
             } else if (annotation.annotationType() == TradeItems.class) {
                 for (TradeItem tradeItem : ((TradeItems) annotation).value()) {
-                    AnnotationUtils.handleTradeItemAnnotation(tradeItem, villagerTrade, clazz);
+                    AnnotationUtils.handleTradeItemAnnotation(tradeItem, villagerTrade, tradeObject);
                 }
             }
         }

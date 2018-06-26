@@ -4,7 +4,7 @@ sudo: required
 install: true
 
 script:
-  - mvn clean install
+  - gradle build
 
 matrix:
     - jdk: oraclejdk8

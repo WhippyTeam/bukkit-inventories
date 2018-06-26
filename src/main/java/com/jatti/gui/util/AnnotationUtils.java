@@ -23,15 +23,15 @@ import com.jatti.gui.animation.AbstractAnimation;
 import com.jatti.gui.animation.annotation.Animation;
 import com.jatti.gui.animation.impl.DiscoAnimation;
 import com.jatti.gui.inv.InventoryImpl;
-import com.jatti.gui.inv.annotation.ConfigItem;
-import com.jatti.gui.inv.annotation.Fill;
-import com.jatti.gui.inv.annotation.Inventory;
-import com.jatti.gui.inv.annotation.Item;
 import com.jatti.gui.inv.exception.InventoryActionException;
 import com.jatti.gui.inv.exception.InventoryParseException;
 import com.jatti.gui.trade.VillagerTrade;
 import com.jatti.gui.trade.annotation.TradeItem;
 import com.jatti.gui.trade.exception.VillagerTradeParseException;
+import com.jatti.gui.inv.annotation.ConfigItem;
+import com.jatti.gui.inv.annotation.Fill;
+import com.jatti.gui.inv.annotation.Inventory;
+import com.jatti.gui.inv.annotation.Item;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -63,7 +63,8 @@ public final class AnnotationUtils {
         }
     }
 
-    public static void handleItemAnnotation(Item item, InventoryImpl inventory, Class<?> clazz) {
+    public static void handleItemAnnotation(Item item, InventoryImpl inventory, Object inventoryObject) {
+        Class<?> clazz = inventoryObject.getClass();
         if (inventory == null) {
             throw new InventoryParseException("Inventory annotation must be first, before any Item annotation!");
         }
@@ -94,7 +95,8 @@ public final class AnnotationUtils {
         }
     }
 
-    public static void handleConfigItemAnnotation(FileConfiguration config, ConfigItem itemFromConfig, InventoryImpl inventory, Class<?> clazz) {
+    public static void handleConfigItemAnnotation(FileConfiguration config, ConfigItem itemFromConfig, InventoryImpl inventory, Object inventoryObject) {
+        Class<?> clazz = inventoryObject.getClass();
         ItemStack itemStack = config.getItemStack(itemFromConfig.value());
 
         if (itemStack == null) {
@@ -161,7 +163,8 @@ public final class AnnotationUtils {
         inventory.addAnimation(anim);
     }
 
-    public static void handleTradeItemAnnotation(TradeItem tradeItem, VillagerTrade villagerTrade, Class<?> clazz) {
+    public static void handleTradeItemAnnotation(TradeItem tradeItem, VillagerTrade villagerTrade, Object tradeObject) {
+        Class<?> clazz = tradeObject.getClass();
         if (villagerTrade == null) {
             throw new VillagerTradeParseException("VillagerTrade annotation must be first, before any TradeItem annotation!");
         }

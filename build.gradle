@@ -1,7 +1,20 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "com.github.jengelman.gradle.plugins:shadow:2.0.2"
+    }
+}
+
 group 'com.jatti'
-version '1.6-STABLE'
+version '1.6.1'
 
 apply plugin: 'java'
+apply plugin: "com.github.johnrengelman.shadow"
 
 sourceCompatibility = 1.8
 
@@ -13,8 +26,9 @@ repositories {
 
 dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT'
+    compile 'org.apache.httpcomponents:httpclient:4.5.5'
 }
 
-jar {
+shadowJar {
     baseName "Bukkit-Inventories"
 }
