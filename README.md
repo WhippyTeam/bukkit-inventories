@@ -49,7 +49,7 @@ dependencies {
 @Item(material = Material.GOLDEN_APPLE, name = "&ctest", slot = 1, action = "itemAction")
 @Item(material = Material.GOLDEN_APPLE, slot = 2, forceEmptyName = true, forceEmptyLore = true)
 @Item(item = "coolItem", slot = 3)
-@ConfigItem("value.from.config", slot = 4)
+@ConfigItem(value = "value.from.config", slot = 4)
 @Fill(material = Material.STAINED_GLASS_PANE, type = 16)
 public class TestInventory {
 
