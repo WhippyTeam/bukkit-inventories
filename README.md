@@ -7,15 +7,9 @@ To build with gradle, use these commands:
 $ git clone https://github.com/whippytools/bukkit-inventories.git
 $ gradle build
 ```
-<<<<<<< HEAD
 and if you want jar (with all dependencies) you can use:
 ```shell
 $ gradle shadowJar
-=======
-and if you want jar you can use:
-```shell
-$ gradle jar
->>>>>>> 12ba74ea23cd1aea6253b21e9ed438de0dcc9e09
 ```
 You also can download this, as a dependency using the following setup.
 In Maven:
@@ -44,14 +38,8 @@ repositories {
 
 ```gradle
 dependencies {
-<<<<<<< HEAD
     compile group: 'com.github.whippytools', name: 'bukkit-inventories', version: 'newest-version'
 }```
-=======
-    compile group: 'com.github.whippytools', name: 'bukkit-inventories', version: '1-6-STABLE'
-}
-```
->>>>>>> 12ba74ea23cd1aea6253b21e9ed438de0dcc9e09
 
 # Example usage (normal inv)
 ```java
